@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, Children } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
 //Create context
@@ -10,7 +10,7 @@ export const useAuth = () => {
 };
 
 //Provider component
-export const AuthProvider = ({ Children }) => {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); //logged in user
     const [loading, setLoading] = useState(true);
 
@@ -54,7 +54,7 @@ export const AuthProvider = ({ Children }) => {
             login, 
             logout, 
             loading }}>
-            {Children}
+            {children}
         </AuthContext.Provider>
     );
 };
