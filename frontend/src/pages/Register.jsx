@@ -33,6 +33,7 @@ const Register = () => {
             await register(formData);
             navigate("/"); //redirect to the dashboard after the user registers
         } catch (err) {
+            console.log(err);
             setError(err.response?.data?.message || "Registration failed");
         } finally {
             setLoading(false);
