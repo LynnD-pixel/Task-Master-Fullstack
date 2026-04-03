@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { apiClient, projectClient } from "../clients/api";
+import { apiClient, projectClient } from "../clients/api.js";
 import TaskForm from "../components/TaskForm";
 import TaskCard from "../components/TaskCard";
 

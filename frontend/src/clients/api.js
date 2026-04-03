@@ -19,6 +19,10 @@ export const projectClient = axios.create({
     baseURL: `${BASE_URL}/api/projects`,
 });
 
+export const apiClient = axios.create({
+    baseURL: `${BASE_URL}/api`,
+});
+
 //attach token dynamically
 [userClient, projectClient].forEach((client) => {
     client.interceptors.request.use((req) => {
