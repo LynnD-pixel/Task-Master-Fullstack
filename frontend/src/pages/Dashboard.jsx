@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { projectClient } from "../clients/api";
-import { Link } from "react-router-dom";
+import ProjectCard from "../components/ProjectCard";
 
-const Dashboard = () => {
-  const { user } = useAuth();
+function Dashboard() {
+  const { user, logout } = useAuth();
+
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -17,7 +19,8 @@ const Dashboard = () => {
         const { data } = await projectClient.get("/");
         setProjects(data);
       } catch (err) {
-        setError("Failed to load projects");
+        console.error(err);
+        setError(err.response?.data?.message || "Failed to load projects");
       } finally {
         setLoading(false);
       }
@@ -30,32 +33,37 @@ const Dashboard = () => {
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       const { data } = await projectClient.post("/", {
         name,
         description,
-        user: user._id, //user ID
       });
-      //add new project to UI instantly
-      setProjects((prev) => [data, ...prev]);
 
+      setProjects((prev) => [data, ...prev]);
       setName("");
       setDescription("");
     } catch (err) {
       console.error(err);
+      setError(err.response?.data?.message || "Failed to create project");
     }
   };
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome {user?.username}</p>
+    <div className="page">
+      <div className="topbar">
+        <h1>Dashboard</h1>
+        <button type="button" onClick={logout}>
+          Logout
+        </button>
+      </div>
 
-      {loading && <p>Loading projects...</p>}
-      {error && <p>{error}</p>}
+      <p>Welcome, {user?.username}</p>
 
-      <form onSubmit={handleCreateProject}>
+      {error && <p className="error">{error}</p>}
+
+      <form onSubmit={handleCreateProject} className="card form-card">
         <h2>Create Project</h2>
 
         <input
@@ -68,34 +76,32 @@ const Dashboard = () => {
 
         <input
           type="text"
-          placeholder="Description"
+          placeholder="Project description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
         />
 
-        <button type="submit">Create</button>
+        <button type="submit">Create Project</button>
       </form>
 
-      <div>
+      <div className="card">
         <h2>Your Projects</h2>
-        {projects.length === 0 ? (
+
+        {loading ? (
+          <p>Loading projects...</p>
+        ) : projects.length === 0 ? (
           <p>No projects yet</p>
         ) : (
-            projects.map((project) => (
-              <div key={project._id}>
-                <h3>
-                  <Link to={`/projects/${project._id}`}>
-                    {project.name}
-                  </Link>
-                </h3>
-                <p>{project.description}</p>
-              </div>
-            ))
+          <div className="list">
+            {projects.map((project) => (
+              <ProjectCard key={project._id} project={project} />
+            ))}
+          </div>
         )}
       </div>
     </div>
   );
-};
+}
 
 export default Dashboard;

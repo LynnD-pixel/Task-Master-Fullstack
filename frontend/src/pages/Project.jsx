@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import { token } from "../clients/api";
-
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+import { Link, useParams } from "react-router-dom";
+import { apiClient, projectClient } from "../clients/api";
+import TaskForm from "../components/TaskForm";
+import TaskCard from "../components/TaskCard";
 
 function Project() {
   const { id } = useParams();
@@ -13,30 +12,17 @@ function Project() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("To Do");
-
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
-        const projectRes = await axios.get(`${BASE_URL}/api/projects/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token()}`,
-          },
-        });
-
-        const tasksRes = await axios.get(`${BASE_URL}/api/projects/${id}/tasks`, {
-          headers: {
-            Authorization: `Bearer ${token()}`,
-          },
-        });
+        const projectRes = await projectClient.get(`/${id}`);
+        const tasksRes = await apiClient.get(`/projects/${id}/tasks`);
 
         setProject(projectRes.data);
         setTasks(tasksRes.data);
       } catch (err) {
         console.error(err);
-        setError("Failed to load project");
+        setError(err.response?.data?.message || "Failed to load project");
       } finally {
         setLoading(false);
       }
@@ -45,132 +31,74 @@ function Project() {
     fetchProjectData();
   }, [id]);
 
-  const handleCreateTask = async (e) => {
-    e.preventDefault();
-
+  const handleCreateTask = async (taskData) => {
     try {
-      const { data } = await axios.post(
-        `${BASE_URL}/api/projects/${id}/tasks`,
-        {
-          title,
-          description,
-          status,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token()}`,
-          },
-        }
-      );
-
+      const { data } = await apiClient.post(`/projects/${id}/tasks`, taskData);
       setTasks((prev) => [data, ...prev]);
-      setTitle("");
-      setDescription("");
-      setStatus("To Do");
     } catch (err) {
       console.error(err);
-      setError("Failed to create task");
+      setError(err.response?.data?.message || "Failed to create task");
     }
   };
 
   const handleDeleteTask = async (taskId) => {
     try {
-      await axios.delete(`${BASE_URL}/api/tasks/${taskId}`, {
-        headers: {
-          Authorization: `Bearer ${token()}`,
-        },
-      });
-
+      await apiClient.delete(`/tasks/${taskId}`);
       setTasks((prev) => prev.filter((task) => task._id !== taskId));
     } catch (err) {
       console.error(err);
-      setError("Failed to delete task");
+      setError(err.response?.data?.message || "Failed to delete task");
     }
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
-      const { data } = await axios.put(
-        `${BASE_URL}/api/tasks/${taskId}`,
-        { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token()}`,
-          },
-        }
-      );
+      const { data } = await apiClient.put(`/tasks/${taskId}`, {
+        status: newStatus,
+      });
 
       setTasks((prev) =>
         prev.map((task) => (task._id === taskId ? data : task))
       );
     } catch (err) {
       console.error(err);
-      setError("Failed to update task");
+      setError(err.response?.data?.message || "Failed to update task");
     }
   };
 
-  if (loading) return <p>Loading project...</p>;
-  if (error) return <p>{error}</p>;
-  if (!project) return <p>Project not found</p>;
+  if (loading) return <p className="page">Loading project...</p>;
+  if (error) return <p className="page error">{error}</p>;
+  if (!project) return <p className="page">Project not found</p>;
 
   return (
-    <div>
-      <h1>{project.name}</h1>
-      <p>{project.description}</p>
+    <div className="page">
+      <p>
+        <Link to="/">← Back to Dashboard</Link>
+      </p>
 
-      <form onSubmit={handleCreateTask}>
-        <h2>Create Task</h2>
+      <div className="card">
+        <h1>{project.name}</h1>
+        <p>{project.description}</p>
+      </div>
 
-        <input
-          type="text"
-          placeholder="Task title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+      <TaskForm onCreateTask={handleCreateTask} />
 
-        <input
-          type="text"
-          placeholder="Task description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="To Do">To Do</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Done">Done</option>
-        </select>
-
-        <button type="submit">Add Task</button>
-      </form>
-
-      <div>
+      <div className="card">
         <h2>Tasks</h2>
 
         {tasks.length === 0 ? (
           <p>No tasks yet</p>
         ) : (
-          tasks.map((task) => (
-            <div key={task._id}>
-              <h3>{task.title}</h3>
-              <p>{task.description}</p>
-              <p>Status: {task.status}</p>
-
-              <select
-                value={task.status}
-                onChange={(e) => handleStatusChange(task._id, e.target.value)}
-              >
-                <option value="To Do">To Do</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Done">Done</option>
-              </select>
-
-              <button type="button" onClick={() => handleDeleteTask(task._id)}>
-                Delete Task
-              </button>
-            </div>
-          ))
+          <div className="list">
+            {tasks.map((task) => (
+              <TaskCard
+                key={task._id}
+                task={task}
+                onStatusChange={handleStatusChange}
+                onDelete={handleDeleteTask}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
