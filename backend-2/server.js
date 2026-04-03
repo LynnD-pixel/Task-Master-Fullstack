@@ -6,10 +6,10 @@ import userRoutes from "./routes/api/userRoutes.js";
 import projectRoutes from "./routes/api/projectRoutes.js";
 import taskRoutes from "./routes/api/taskRoutes.js";
 
-connectDB()
-
 const app = express()
 const PORT = process.env.PORT || 3001;
+
+connectDB()
 
 app.use(express.json());
 app.use(cors());
@@ -19,7 +19,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api", taskRoutes);
 
 
-app.use("/", (req, res) => {
+app.get("/", (req, res) => {
     res.send("API is running...");
 });
 

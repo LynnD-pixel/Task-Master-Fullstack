@@ -17,7 +17,7 @@ router.post("/", authMiddleware, async (req, res) => {
         });
         res.status(201).json(project);
     } catch (err) {
-        res.status(401).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
 });
 
@@ -28,7 +28,7 @@ router.get("/", authMiddleware, async (req, res) => {
 
         res.json(projects);
     } catch (err) {
-        res.status(401).json({ message: err.message })
+        res.status(500).json({ message: err.message })
     }
 });
 
@@ -49,7 +49,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
 
     res.json(project);
   } catch (err) {
-    res.status(401).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -73,7 +73,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
     res.json(updatedProject);
   } catch (err) {
-    res.status(401).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -94,7 +94,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
 
     res.json({ message: "Project removed" });
   } catch (err) {
-    res.status(401).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 

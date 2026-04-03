@@ -3,12 +3,15 @@ import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET;
 
 export default function generateToken(user) {
-  const payload = {
-    id: user._id,
-    username: user.username,
-    email: user.email,
-  };
-  
-  return jwt.sign(payload, secret, { expiresIn: "2h" });
+  return jwt.sign(
+    {
+      data: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    },
+      process.env.JWT_SECRET,
+    { expiresIn: "2h" });
 }
 

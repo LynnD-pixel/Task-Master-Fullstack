@@ -7,11 +7,11 @@ const BASE_URL = import.meta.env.VITE_BASE_URL
 export const token = () => {
     const user = JSON.parse(localStorage.getItem("userInfo"));
     return user?.token;
-}
+};
 
 //users API
 export const userClient = axios.create({
-    baseURL: BASE_URL + '/api/users',
+    baseURL: `${BASE_URL}/api/users`,
 });
 
 //projects API
@@ -24,7 +24,7 @@ export const apiClient = axios.create({
 });
 
 //attach token dynamically
-[userClient, projectClient].forEach((client) => {
+[userClient, projectClient, apiClient].forEach((client) => {
     client.interceptors.request.use((req) => {
         const t = token();
 
