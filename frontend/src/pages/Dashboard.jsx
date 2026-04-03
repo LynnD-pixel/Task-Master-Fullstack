@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { projectClient } from "../clients/api";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -35,7 +36,7 @@ const Dashboard = () => {
         name,
         description,
       });
-        //add new project to UI instantly
+      //add new project to UI instantly
       setProjects((prev) => [data, ...prev]);
 
       setName("");
@@ -80,16 +81,20 @@ const Dashboard = () => {
         {projects.length === 0 ? (
           <p>No projects yet</p>
         ) : (
-          projects.map((project) => (
-            <div key={project._id}>
-              <h3>{project.name}</h3>
-              <p>{project.description}</p>
-            </div>
-          ))
+            projects.map((project) => (
+              <div key={project._id}>
+                <h3>
+                  <Link to={`/projects/${project._id}`}>
+                    {project.name}
+                  </Link>
+                </h3>
+                <p>{project.description}</p>
+              </div>
+            ))
         )}
       </div>
     </div>
   );
 };
 
-export default Dashboard
+export default Dashboard;

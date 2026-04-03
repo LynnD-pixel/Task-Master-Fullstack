@@ -23,8 +23,10 @@ export const projectClient = axios.create({
 [userClient, projectClient].forEach((client) => {
     client.interceptors.request.use((req) => {
         const t = token();
+
+        console.log("TOKEN BEING SENT:", t);
         if (t) {
-            req.headers.Authorization = `Bearer ${t}`
+            req.headers.Authorization = `Bearer ${t}`;
         }
         return req;
     });
