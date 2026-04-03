@@ -6,6 +6,7 @@ const router = express.Router();
 
 //Create Project
 router.post("/", authMiddleware, async (req, res) => {
+    console.log("REQ.USER:", req.user);
     const { name, description } = req.body;
 
     try {

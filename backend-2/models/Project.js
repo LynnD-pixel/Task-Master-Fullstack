@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const projectSchema = new mongoose.Schema (
+const projectSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -9,11 +9,12 @@ const projectSchema = new mongoose.Schema (
         },
         description: {
             type: String,
+            required: true,
             default: "",
         },
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "User", //refers to the User model
             required: true,
         },
     },

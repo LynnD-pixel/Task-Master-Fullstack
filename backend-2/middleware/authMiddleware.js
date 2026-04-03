@@ -3,29 +3,28 @@ import User from "../models/User.js";
 
 const secret = process.env.JWT_SECRET
 
-export async function authMiddleware(req, res, next) {
-    try {
-        let token = req.headers.authorization 
+export function authMiddleware(req, res, next) {
+  let token = req.headers.authorization;
 
-        // Remove the "Bearer " at the front (ex: "Bearer ourtoken" -> "ourtoken")
-        if (token) {
-            token = token.split(" ").pop().trim()
-        }
+  console.log("HEADERS:", req.headers.authorization);
 
-        // check if user didn't send the token
-        if (!token) {
-            return res.status(401).json({ message: 'No token found' })
-        }
+  if (token) {
+    token = token.split(" ").pop().trim();
+  }
 
-        // verify the token and give us the payload
-        const { data } = jwt.verify(token, secret)
+  if (!token) {
+    return res.status(401).json({ message: "No token found" });
+  }
 
-        // create a new property on our request object (req.user) with our payload value
-        req.user = data
+  try {
+    const decoded = jwt.verify(token, secret);
 
-    } catch(e) {
-        return res.status(401).json({ message: 'Invalid token!' });
-    }  
+    console.log("DECODED:", decoded);
+    req.user = {
+      _id: decoded.data._id};
+  } catch (e) {
+    return res.status(401).json({ message: "Invalid token!" });
+  }
 
-    next()
+  next();
 }

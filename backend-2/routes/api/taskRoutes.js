@@ -30,7 +30,7 @@ router.post("/projects/:projectId/tasks", authMiddleware, async (req, res) => {
 
     res.status(201).json(task);
   } catch (err) {
-    res.status(401).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -52,7 +52,7 @@ router.get("/projects/:projectId/tasks", authMiddleware, async (req, res) => {
 
     res.json(tasks);
   } catch (err) {
-    res.status(401).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -85,7 +85,7 @@ router.put("/tasks/:taskId", authMiddleware, async (req, res) => {
 
     res.json(updatedTask);
   } catch (err) {
-    res.status(401).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -112,7 +112,7 @@ router.delete("/tasks/:taskId", authMiddleware, async (req, res) => {
 
     res.json({ message: "Task removed" });
   } catch (err) {
-    res.status(401).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 

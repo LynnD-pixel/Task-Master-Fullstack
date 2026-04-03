@@ -1,24 +1,25 @@
 import express from "express";
 import User from "../../models/User.js";
-import { generateToken } from "../../utils/generateToken.js";
+import generateToken from "../../utils/generateToken.js";
 
 const router = express.Router();
 
-
-
-// Register User
+//
+// 🔹 REGISTER USER
+// POST /api/users/register
+//
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // checks if user exists
+    // Check if user already exists
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create user and hash passwod
+    // Create user (password will be hashed automatically)
     const user = await User.create({
       username,
       email,
@@ -36,12 +37,14 @@ router.post("/register", async (req, res) => {
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
-    res.status(401).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-
-//  Login the USER
+//
+// 🔹 LOGIN USER
+// POST /api/users/login
+//
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -61,7 +64,7 @@ router.post("/login", async (req, res) => {
       res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

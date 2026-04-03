@@ -35,6 +35,7 @@ const Dashboard = () => {
       const { data } = await projectClient.post("/", {
         name,
         description,
+        user: user._id, //user ID
       });
       //add new project to UI instantly
       setProjects((prev) => [data, ...prev]);
