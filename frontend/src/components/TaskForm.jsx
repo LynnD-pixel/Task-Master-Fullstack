@@ -51,9 +51,9 @@ function TaskForm({ onCreateTask }) {
         value={formData.status}
         onChange={handleChange}
       >
-        <option value="To Do">To Do</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Done">Done</option>
+        <option value="To Do">To Do 😩</option>
+        <option value="In Progress">In Progress ⏳</option>
+        <option value="Done">Done 🙌</option>
       </select>
 
       <button type="submit">Add Task</button>

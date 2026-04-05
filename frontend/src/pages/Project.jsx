@@ -71,7 +71,7 @@ function Project() {
   if (!project) return <p className="page">Project not found</p>;
 
   return (
-    <div className="page">
+    <div className="project-grid">
       <p>
         <Link to="/">← Back to Dashboard</Link>
       </p>

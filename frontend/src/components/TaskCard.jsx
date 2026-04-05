@@ -5,13 +5,17 @@ function TaskCard({ task, onStatusChange, onDelete }) {
       <p>{task.description}</p>
       <p>Status: {task.status}</p>
 
+      <span className={`status-badge ${task.status === "To Do"
+        ? "status-todo" : task.status === "In Progress" ? "status-progress" : "status-done"
+      }`}>{task.status}</span>
+
       <select
         value={task.status}
         onChange={(e) => onStatusChange(task._id, e.target.value)}
       >
-        <option value="To Do">To Do</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Done">Done</option>
+        <option value="To Do">To Do 😩</option>
+        <option value="In Progress">In Progress ⏳</option>
+        <option value="Done">Done 🙌</option>
       </select>
 
       <button type="button" onClick={() => onDelete(task._id)}>
