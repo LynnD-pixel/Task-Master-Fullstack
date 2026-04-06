@@ -11,6 +11,9 @@ function Project() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -66,40 +69,108 @@ function Project() {
     }
   };
 
+  const handleEditTask = async (taskId) => {
+    try {
+      const { data } = await apiClient.put(`/tasks/${taskId}`, {
+        title: editTitle,
+        description: editDescription,
+      });
+
+      setTasks((prev) =>
+        prev.map((task) => (task._id === taskId ? data : task))
+      );
+
+      setEditingTaskId(null);
+      setEditTitle("");
+      setEditDescription("");
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Failed to update task");
+    }
+  };
+
   if (loading) return <p className="page">Loading project...</p>;
   if (error) return <p className="page error">{error}</p>;
   if (!project) return <p className="page">Project not found</p>;
 
   return (
-    <div className="project-grid">
+    <div className="page">
       <p>
         <Link to="/">← Back to Dashboard</Link>
       </p>
 
-      <div className="card">
-        <h1>{project.name}</h1>
-        <p>{project.description}</p>
-      </div>
-
-      <TaskForm onCreateTask={handleCreateTask} />
-
-      <div className="card">
-        <h2>Tasks</h2>
-
-        {tasks.length === 0 ? (
-          <p>No tasks yet</p>
-        ) : (
-          <div className="list">
-            {tasks.map((task) => (
-              <TaskCard
-                key={task._id}
-                task={task}
-                onStatusChange={handleStatusChange}
-                onDelete={handleDeleteTask}
-              />
-            ))}
+      <div className="project-grid">
+        <div>
+          <div className="card">
+            <h1>{project.name}</h1>
+            <p>{project.description}</p>
           </div>
-        )}
+
+          <TaskForm onCreateTask={handleCreateTask} />
+        </div>
+
+        <div className="card">
+          <h2>Tasks</h2>
+
+          {tasks.length === 0 ? (
+            <p>No tasks yet</p>
+          ) : (
+            <div className="list">
+              {tasks.map((task) => (
+                <div key={task._id} className="list-item">
+                  {editingTaskId === task._id ? (
+                    <>
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                      />
+
+                      <input
+                        type="text"
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => handleEditTask(task._id)}
+                      >
+                        Save
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setEditingTaskId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <TaskCard
+                        task={task}
+                        onStatusChange={handleStatusChange}
+                        onDelete={handleDeleteTask}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingTaskId(task._id);
+                          setEditTitle(task.title);
+                          setEditDescription(task.description || "");
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
